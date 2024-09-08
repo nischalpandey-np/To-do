@@ -3,25 +3,28 @@ from mysql.connector import Error
 
 # Configure your MySQL connection
 db_config = {
-    'user': 'root',  
-    'password': 'your password here',  
-    'host': 'localhost',  
-    'database': 'todo_db'  
+    'user': 'root',
+    'password': 'your password here',
+    'host': '127.0.0.1',
+    'database': 'todo_db'
 }
 
 # Create a connection to the MySQL database
 try:
-    conn = mysql.connector.connect(**db_config)
-    cursor = conn.cursor()
+    connection = mysql.connector.connect(**db_config)
+    cursor = connection.cursor()  # Corrected from `conn.cursor()` to `connection.cursor()`
 
     # Create the tasks table if it doesn't exist
-    cursor.execute('''
-    CREATE TABLE IF NOT EXISTS tasks (
+    cursor.execute(
+        '''
+    CREATE TABLE IF NOT EXISTS tasks 
+    (
         id INT AUTO_INCREMENT PRIMARY KEY,
         task VARCHAR(255) NOT NULL
     )
-    ''')
-    conn.commit()
+    '''
+    )
+    connection.commit()
 
     def display_options():
         """Display the main options for the TO-DO list manager."""
@@ -48,11 +51,12 @@ try:
 
     def add_new_task():
         """Add a new task to the TO-DO list and insert it into the database."""
+       
         task = input("Please enter a task: ").strip()
         if task:
             try:
                 cursor.execute("INSERT INTO tasks (task) VALUES (%s)", (task,))
-                conn.commit()
+                connection.commit()
                 print(f"Task '{task}' has been added to your TO-DO list.")
             except Error as e:
                 print(f"Error adding task: {e}")
@@ -80,7 +84,7 @@ try:
         try:
             task_to_delete = int(input("Enter the task number to delete: "))
             cursor.execute("DELETE FROM tasks WHERE id = %s", (task_to_delete,))
-            conn.commit()
+            connection.commit()
             if cursor.rowcount > 0:
                 print(f"Task #{task_to_delete} was deleted successfully.")
             else:
@@ -99,7 +103,7 @@ except Error as e:
     print(f"Error connecting to MySQL: {e}")
 finally:
     # Close the connection when the program exits
-    if conn.is_connected():
+    if connection.is_connected():
         cursor.close()
-        conn.close()
+        connection.close()
         print("MySQL connection is closed.")

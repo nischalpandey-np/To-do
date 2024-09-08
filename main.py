@@ -1,10 +1,11 @@
 import mysql.connector
 from mysql.connector import Error
+from tabulate import tabulate
 
 # Configure your MySQL connection
 db_config = {
     'user': 'root',
-    'password': 'your password here',
+    'password': '#####',
     'host': '127.0.0.1',
     'database': 'todo_db'
 }
@@ -12,7 +13,7 @@ db_config = {
 # Create a connection to the MySQL database
 try:
     connection = mysql.connector.connect(**db_config)
-    cursor = connection.cursor()  # Corrected from `conn.cursor()` to `connection.cursor()`
+    cursor = connection.cursor() 
 
     # Create the tasks table if it doesn't exist
     cursor.execute(
@@ -69,9 +70,9 @@ try:
         try:
             cursor.execute("SELECT * FROM tasks")
             tasks = cursor.fetchall()
+            
             if tasks:
-                for task in tasks:
-                    print(f"Task #{task[0]}: {task[1]}")
+               print(tabulate(tasks, headers=['ID', 'Task'], tablefmt='pretty'))
             else:
                 print("There are no tasks currently.")
         except Error as e:
